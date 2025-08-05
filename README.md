@@ -1,4 +1,4 @@
-# DailyGrocer - AI-Powered Grocery E-commerce Platform
+# GrocerAI - AI-Powered Grocery E-commerce Platform
 
 A modern, full-stack grocery e-commerce application featuring AI-powered meal suggestions and intelligent shopping capabilities. Built with scalable technologies to deliver a seamless user experience.
 
