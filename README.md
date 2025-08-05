@@ -164,7 +164,7 @@ This project is licensed under the **ISC License**.
 
 ## �‍💻 Developer
 
-**Saish Tiwari**
+**Aliza Simkhada**
 
 ---
 
