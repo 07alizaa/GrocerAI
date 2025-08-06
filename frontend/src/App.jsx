@@ -8,6 +8,7 @@ import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
 import DailyGrocerLanding from './pages/DailyGrocerLanding'
+import About from './pages/About'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
@@ -54,6 +55,7 @@ const App = () => {
             <Toaster position="top-right" />
             <Routes>
               <Route path="/" element={<DailyGrocerLanding />} />
+              <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               

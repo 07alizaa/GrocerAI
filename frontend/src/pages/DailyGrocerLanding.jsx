@@ -8,6 +8,7 @@ import ProductsShowcase from '../components/ProductsShowcase';
 import Testimonials from '../components/Testimonials';
 import Newsletter from '../components/Newsletter';
 import Footer from '../components/Footer';
+import AISuggestionBox from '../components/AISuggestionBox';
 
 const DailyGrocerLanding = () => {
   return (
@@ -23,6 +24,9 @@ const DailyGrocerLanding = () => {
         <Newsletter />
       </main>
       <Footer />
+      
+      {/* AI Suggestion Box for landing page */}
+      <AISuggestionBox showOnDashboard={false} />
     </div>
   );
 };

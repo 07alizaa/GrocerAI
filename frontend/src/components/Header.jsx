@@ -30,12 +30,12 @@ const Header = () => {
   const cartCount = getCartCount();
 
   return (
-    <header className="bg-white/95 backdrop-blur-sm shadow-lg sticky top-0 z-50 border-b border-gray-200">
+    <header className="bg-white/95 backdrop-blur-sm shadow-xl sticky top-0 z-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link to={isAuthenticated ? (isAdmin ? "/admin/dashboard" : "/buyer/home") : "/"} className="text-2xl font-bold text-primary hover:scale-105 transition-transform duration-300">
+            <Link to={isAuthenticated ? (isAdmin ? "/admin/dashboard" : "/buyer/home") : "/"} className="text-3xl font-black text-primary hover:scale-105 transition-transform duration-300 tracking-tight">
               Grocer<span className="text-accent">AI</span>
             </Link>
           </div>
@@ -47,49 +47,49 @@ const Header = () => {
                 {isAdmin ? (
                   // Admin Navigation
                   <>
-                    <Link to="/admin/dashboard" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                    <Link to="/admin/dashboard" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                       Dashboard
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                     </Link>
-                    <Link to="/admin/users" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                    <Link to="/admin/users" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                       Users
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                     </Link>
-                    <Link to="/admin/products" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                    <Link to="/admin/products" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                       Products
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                     </Link>
-                    <Link to="/admin/categories" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                    <Link to="/admin/categories" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                       Categories
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                     </Link>
-                    <Link to="/admin/orders" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                    <Link to="/admin/orders" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                       Orders
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                     </Link>
-                    <Link to="/admin/reports" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                    <Link to="/admin/reports" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                       Reports
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                     </Link>
                   </>
                 ) : (
                   // Buyer Navigation
                   <>
-                    <Link to="/buyer/home" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                    <Link to="/buyer/home" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                       Home
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                     </Link>
-                    <Link to="/products" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                    <Link to="/products" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                       Products
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                     </Link>
-                    <Link to="/categories" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                    <Link to="/categories" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                       Categories
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                     </Link>
-                    <Link to="/orders" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                    <Link to="/orders" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                       My Orders
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                      <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                     </Link>
                   </>
                 )}
@@ -97,38 +97,38 @@ const Header = () => {
             ) : (
               // Guest Navigation
               <>
-                <Link to="/" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                <Link to="/" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                   Home
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                  <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                 </Link>
-                <a href="/#products" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                <a href="/#products" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                   Products
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                  <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                 </a>
-                <a href="/#categories" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                <a href="/#categories" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                   Categories
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                  <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                 </a>
-                <a href="/#about" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                <Link to="/about" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                   About
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
-                </a>
-                <a href="/#contact" className="relative text-primary hover:text-accent px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 group">
+                  <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
+                </Link>
+                <a href="/#contact" className="relative text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 group">
                   Contact
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                  <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-primary rounded-full group-hover:w-6 transition-all duration-300"></span>
                 </a>
               </>
             )}
           </nav>
 
           {/* Right side buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-6">
             {isAuthenticated && !isAdmin && (
               // Cart button for buyers only
-              <Link to="/cart" className="relative p-2 text-primary hover:text-accent transition-all duration-300 group">
-                <ShoppingCart className="h-6 w-6" />
+              <Link to="/cart" className="relative p-3 text-primary hover:text-primary hover:bg-gray-50 rounded-xl transition-all duration-300 group">
+                <ShoppingCart className="h-7 w-7" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-accent text-textDark text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold animate-pulse">
+                  <span className="absolute -top-1 -right-1 bg-accent text-textDark text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold animate-pulse shadow-lg">
                     {cartCount}
                   </span>
                 )}
@@ -140,47 +140,49 @@ const Header = () => {
               <div className="relative">
                 <button
                   onClick={toggleUserDropdown}
-                  className="flex items-center space-x-2 text-primary hover:text-accent px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-gray-50 group"
+                  className="flex items-center space-x-3 text-primary hover:text-primary px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-gray-50 group"
                 >
-                  <User className="h-5 w-5" />
+                  <div className="p-1 bg-primary rounded-full">
+                    <User className="h-5 w-5 text-textLight" />
+                  </div>
                   <span>{user?.name || 'User'}</span>
-                  <ChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform duration-300" />
+                  <ChevronDown className="h-5 w-5 group-hover:rotate-180 transition-transform duration-300" />
                 </button>
 
                 {isUserDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl py-2 z-50 border border-gray-100">
                     {isAdmin ? (
                       <>
                         <Link
                           to="/admin/profile"
-                          className="flex items-center px-4 py-2 text-sm text-textDark hover:bg-gray-100"
+                          className="flex items-center px-4 py-3 text-sm text-textDark hover:bg-gray-50 rounded-lg mx-2"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
-                          <Settings className="h-4 w-4 mr-2" />
+                          <Settings className="h-4 w-4 mr-3 text-primary" />
                           Admin Settings
                         </Link>
                         <Link
                           to="/admin/users"
-                          className="flex items-center px-4 py-2 text-sm text-textDark hover:bg-gray-100"
+                          className="flex items-center px-4 py-3 text-sm text-textDark hover:bg-gray-50 rounded-lg mx-2"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
-                          <Users className="h-4 w-4 mr-2" />
+                          <Users className="h-4 w-4 mr-3 text-primary" />
                           Manage Users
                         </Link>
                         <Link
                           to="/admin/products"
-                          className="flex items-center px-4 py-2 text-sm text-textDark hover:bg-gray-100"
+                          className="flex items-center px-4 py-3 text-sm text-textDark hover:bg-gray-50 rounded-lg mx-2"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
-                          <Package className="h-4 w-4 mr-2" />
+                          <Package className="h-4 w-4 mr-3 text-primary" />
                           Manage Products
                         </Link>
                         <Link
                           to="/admin/reports"
-                          className="flex items-center px-4 py-2 text-sm text-textDark hover:bg-gray-100"
+                          className="flex items-center px-4 py-3 text-sm text-textDark hover:bg-gray-50 rounded-lg mx-2"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
-                          <BarChart3 className="h-4 w-4 mr-2" />
+                          <BarChart3 className="h-4 w-4 mr-3 text-primary" />
                           Analytics
                         </Link>
                       </>
@@ -188,36 +190,36 @@ const Header = () => {
                       <>
                         <Link
                           to="/profile"
-                          className="flex items-center px-4 py-2 text-sm text-textDark hover:bg-gray-100"
+                          className="flex items-center px-4 py-3 text-sm text-textDark hover:bg-gray-50 rounded-lg mx-2"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
-                          <User className="h-4 w-4 mr-2" />
+                          <User className="h-4 w-4 mr-3 text-primary" />
                           My Profile
                         </Link>
                         <Link
                           to="/orders"
-                          className="flex items-center px-4 py-2 text-sm text-textDark hover:bg-gray-100"
+                          className="flex items-center px-4 py-3 text-sm text-textDark hover:bg-gray-50 rounded-lg mx-2"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
-                          <Package className="h-4 w-4 mr-2" />
+                          <Package className="h-4 w-4 mr-3 text-primary" />
                           My Orders
                         </Link>
                         <Link
                           to="/cart"
-                          className="flex items-center px-4 py-2 text-sm text-textDark hover:bg-gray-100"
+                          className="flex items-center px-4 py-3 text-sm text-textDark hover:bg-gray-50 rounded-lg mx-2"
                           onClick={() => setIsUserDropdownOpen(false)}
                         >
-                          <ShoppingCart className="h-4 w-4 mr-2" />
+                          <ShoppingCart className="h-4 w-4 mr-3 text-primary" />
                           Cart ({cartCount})
                         </Link>
                       </>
                     )}
-                    <hr className="my-1" />
+                    <hr className="my-2 mx-2" />
                     <button
                       onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      className="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg mx-2 font-medium"
                     >
-                      <LogOut className="h-4 w-4 mr-2" />
+                      <LogOut className="h-4 w-4 mr-3" />
                       Logout
                     </button>
                   </div>
@@ -228,14 +230,14 @@ const Header = () => {
               <>
                 <Link 
                   to="/login"
-                  className="flex items-center space-x-1 text-primary hover:text-accent px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-gray-50"
+                  className="flex items-center space-x-2 text-primary hover:text-primary hover:bg-gray-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300"
                 >
                   <User className="h-5 w-5" />
                   <span>Login</span>
                 </Link>
                 <Link 
                   to="/register"
-                  className="bg-accent text-textDark hover:bg-accent/90 hover:scale-105 px-6 py-2 rounded-lg text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="bg-accent text-textDark hover:bg-accent/90 hover:scale-105 px-6 py-3 rounded-xl text-base font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   Register
                 </Link>
@@ -247,9 +249,9 @@ const Header = () => {
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
-              className="text-primary hover:text-accent p-2 rounded-lg hover:bg-gray-50 transition-all duration-300"
+              className="text-primary hover:text-primary p-3 rounded-xl hover:bg-gray-50 transition-all duration-300"
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
             </button>
           </div>
         </div>
@@ -257,7 +259,7 @@ const Header = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
+            <div className="px-4 pt-4 pb-6 space-y-2 bg-white border-t border-gray-100">
               {isAuthenticated ? (
                 <>
                   {isAdmin ? (
@@ -333,9 +335,9 @@ const Header = () => {
                   <a href="/#categories" className="block text-primary hover:text-accent px-3 py-2 rounded-md text-base font-medium">
                     Categories
                   </a>
-                  <a href="/#about" className="block text-primary hover:text-accent px-3 py-2 rounded-md text-base font-medium">
+                  <Link to="/about" className="block text-primary hover:text-accent px-3 py-2 rounded-md text-base font-medium">
                     About
-                  </a>
+                  </Link>
                   <a href="/#contact" className="block text-primary hover:text-accent px-3 py-2 rounded-md text-base font-medium">
                     Contact
                   </a>

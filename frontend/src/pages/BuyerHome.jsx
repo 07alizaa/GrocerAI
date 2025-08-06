@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Clock, Truck, Star, TrendingUp, User, Heart, Gift, Percent, Zap, MessageCircle, Sparkles, ChefHat, Leaf, Shield, Package, ArrowRight, Award, Users, CheckCircle, Quote, Bell } from 'lucide-react';
+import AISuggestionBox from '../components/AISuggestionBox';
 
 const BuyerHome = () => {
   return (
@@ -795,6 +796,9 @@ const BuyerHome = () => {
           Chat with GrocerAI
         </div>
       </Link>
+
+      {/* AI Suggestion Box for dashboard - will only show once per session */}
+      <AISuggestionBox showOnDashboard={true} />
     </div>
   );
 };

@@ -72,81 +72,82 @@ const ProductsShowcase = () => {
   ];
 
   return (
-    <section id="products" className="py-20 bg-white">
+    <section id="products" className="py-20 bg-secondary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-[#0A400C] mb-4">
+        <div className="text-center mb-16 animate-fade-in-up">
+          <h2 className="text-3xl md:text-5xl font-bold text-primary mb-6">
             Featured Products
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg text-textDark/70 max-w-3xl mx-auto leading-relaxed">
             Discover our top-rated products loved by thousands of customers. 
             Fresh, quality, and delivered with care.
           </p>
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredProducts.map((product) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {featuredProducts.map((product, index) => (
             <div 
               key={product.id}
-              className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group"
+              className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group border border-gray-100 animate-stagger-in hover-lift"
+              style={{ animationDelay: `${600 + index * 150}ms` }}
             >
               {/* Product Image & Badge */}
-              <div className="relative bg-[#ECFAE5] h-48 overflow-hidden">
+              <div className="relative bg-secondary h-40 sm:h-48 overflow-hidden">
                 <img 
                   src={product.image} 
                   alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 
                 {/* Badge */}
-                <div className="absolute top-4 left-4 bg-[#B0DB9C] text-[#0A400C] px-3 py-1 rounded-full text-sm font-medium">
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-primary text-textLight px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg">
                   {product.badge}
                 </div>
 
                 {/* Discount Badge */}
                 {product.discount && (
-                  <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                  <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-accent text-textDark px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg animate-pulse">
                     {product.discount}
                   </div>
                 )}
 
                 {/* Wishlist Button */}
-                <button className="absolute bottom-4 right-4 bg-white rounded-full p-2 shadow-md hover:shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100">
-                  <Heart className="h-5 w-5 text-gray-400 hover:text-red-500 transition-colors" />
+                <button className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 bg-white rounded-full p-2 sm:p-3 shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 border border-gray-200">
+                  <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-textDark/60 hover:text-red-500 transition-colors duration-300" />
                 </button>
               </div>
 
               {/* Product Info */}
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-[#0A400C] mb-2">
+              <div className="p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-bold text-primary mb-2 sm:mb-3 group-hover:text-textDark transition-colors duration-300">
                   {product.name}
                 </h3>
 
                 {/* Rating */}
-                <div className="flex items-center mb-3">
+                <div className="flex items-center mb-3 sm:mb-4">
                   <div className="flex items-center">
                     {[...Array(5)].map((_, i) => (
                       <Star 
                         key={i} 
-                        className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+                        className={`h-3 w-3 sm:h-4 sm:w-4 transition-colors duration-300 ${i < Math.floor(product.rating) ? 'text-accent fill-current' : 'text-gray-300'}`} 
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-gray-600 ml-2">
+                  <span className="text-xs sm:text-sm text-textDark/60 ml-2 font-medium">
                     {product.rating} ({product.reviews} reviews)
                   </span>
                 </div>
 
                 {/* Price */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
                   <div className="flex items-center space-x-2">
-                    <span className="text-2xl font-bold text-[#0A400C]">
+                    <span className="text-xl sm:text-2xl font-bold text-primary">
                       ${product.price}
                     </span>
                     {product.originalPrice && (
-                      <span className="text-lg text-gray-400 line-through">
+                      <span className="text-base sm:text-lg text-textDark/40 line-through">
                         ${product.originalPrice}
                       </span>
                     )}
@@ -154,8 +155,8 @@ const ProductsShowcase = () => {
                 </div>
 
                 {/* Add to Cart Button */}
-                <button className="w-full bg-[#B0DB9C] text-[#0A400C] hover:bg-[#0A400C] hover:text-white py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2 group">
-                  <ShoppingCart className="h-5 w-5" />
+                <button className="w-full bg-primary text-textLight hover:bg-primary/90 py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base transition-all duration-300 flex items-center justify-center space-x-2 group shadow-lg hover:shadow-xl hover:scale-105">
+                  <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 transition-transform duration-300" />
                   <span>Add to Cart</span>
                 </button>
               </div>
@@ -164,8 +165,8 @@ const ProductsShowcase = () => {
         </div>
 
         {/* View All Products */}
-        <div className="text-center mt-12">
-          <button className="border-2 border-[#B0DB9C] text-[#0A400C] hover:bg-[#B0DB9C] hover:text-[#0A400C] px-8 py-3 rounded-lg font-semibold transition-all duration-200">
+        <div className="text-center mt-16 animate-fade-in-up" style={{ animationDelay: '1200ms' }}>
+          <button className="border-2 border-primary text-primary hover:bg-primary hover:text-textLight px-10 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
             View All Products
           </button>
         </div>
