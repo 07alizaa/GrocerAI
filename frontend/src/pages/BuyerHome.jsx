@@ -2,16 +2,17 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Clock, Truck, Star, TrendingUp, User, Heart, Gift, Percent, Zap, MessageCircle, Sparkles, ChefHat, Leaf, Shield, Package, ArrowRight, Award, Users, CheckCircle, Quote, Bell } from 'lucide-react';
 import AISuggestionBox from '../components/AISuggestionBox';
+import RecommendedProducts from '../components/RecommendedProducts';
 
 const BuyerHome = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary via-white to-primary/5">
+    <div className="min-h-screen bg-secondary">
       {/* Premium Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/95 to-primary/90 py-20">
+      <section className="relative overflow-hidden bg-primary py-20">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 25px 25px, ${getComputedStyle(document.documentElement).getPropertyValue('--color-accent') || '#FFD54F'} 1px, transparent 1px)`,
+            backgroundImage: `radial-gradient(circle at 25px 25px, #FFD54F 1px, transparent 1px)`,
             backgroundSize: '50px 50px'
           }}></div>
         </div>
@@ -27,7 +28,7 @@ const BuyerHome = () => {
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
                 Your{' '}
-                <span className="bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent">
+                <span className="text-accent">
                   Premium
                 </span>
                 <br />Shopping Experience
@@ -85,7 +86,7 @@ const BuyerHome = () => {
                   />
                   
                   {/* Floating Premium Badge */}
-                  <div className="absolute -top-4 -right-4 bg-gradient-to-r from-accent to-accent/80 text-primary p-4 rounded-2xl shadow-xl">
+                  <div className="absolute -top-4 -right-4 bg-accent text-primary p-4 rounded-2xl shadow-xl">
                     <Award className="h-6 w-6 mb-1" />
                     <div className="text-xs font-bold">Premium</div>
                   </div>
@@ -106,14 +107,14 @@ const BuyerHome = () => {
               </div>
               
               {/* Background Glow */}
-              <div className="absolute -inset-8 bg-gradient-to-r from-accent/20 to-white/10 rounded-3xl blur-3xl -z-10"></div>
+              <div className="absolute -inset-8 bg-accent/20 rounded-3xl blur-3xl -z-10"></div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Premium Quick Actions */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center bg-white shadow-sm border border-gray-200 text-gray-700 px-6 py-3 rounded-full text-sm font-semibold mb-6">
@@ -192,8 +193,15 @@ const BuyerHome = () => {
         </div>
       </section>
 
+      {/* AI Recommendations Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <RecommendedProducts />
+        </div>
+      </section>
+
       {/* Premium Features Section */}
-      <section className="py-20 bg-gradient-to-br from-secondary to-white">
+      <section className="py-20 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center bg-accent/10 text-accent px-6 py-2 rounded-full text-sm font-semibold mb-6">
@@ -297,9 +305,9 @@ const BuyerHome = () => {
       </section>
 
       {/* Premium Special Offers */}
-      <section className="py-16 bg-gradient-to-r from-primary to-primary/90 relative overflow-hidden">
+      <section className="py-16 bg-primary relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-white" style={{backgroundImage: 'radial-gradient(circle at 2px 2px, white 2px, transparent 0)', backgroundSize: '40px 40px'}}></div>
+          <div className="absolute inset-0 bg-white" style={{backgroundImage: 'radial-gradient(circle at 2px 2px, #F9F9F9 2px, transparent 0)', backgroundSize: '40px 40px'}}></div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center">
@@ -326,7 +334,7 @@ const BuyerHome = () => {
       </section>
 
       {/* Premium Categories */}
-      <section className="py-20 bg-gradient-to-br from-secondary to-white">
+      <section className="py-20 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center bg-primary/10 text-primary px-6 py-2 rounded-full text-sm font-semibold mb-6">
@@ -442,8 +450,8 @@ const BuyerHome = () => {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                     
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-black/20"></div>
                   </div>
                   
                   {/* Premium Badge */}
@@ -521,7 +529,7 @@ const BuyerHome = () => {
                   </div>
 
                   {/* Add to Cart Button */}
-                  <button className="w-full bg-gradient-to-r from-primary to-primary/90 text-white hover:from-primary/90 hover:to-primary py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 group/btn hover:shadow-lg hover:shadow-primary/25 transform hover:scale-[1.02]">
+                  <button className="w-full bg-primary text-white hover:bg-primary/90 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 group/btn hover:shadow-lg hover:shadow-primary/25 transform hover:scale-[1.02]">
                     <ShoppingCart className="h-4 w-4 group-hover/btn:animate-bounce" />
                     <span>Add to Cart</span>
                   </button>
@@ -533,14 +541,14 @@ const BuyerHome = () => {
                 </div>
 
                 {/* Premium Shine Effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-white/10 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
               </div>
             ))}
           </div>
 
           {/* Call to Action Section */}
           <div className="text-center mt-16">
-            <div className="bg-gradient-to-r from-secondary/50 to-primary/5 rounded-2xl p-8 border border-primary/10">
+            <div className="bg-secondary/50 rounded-2xl p-8 border border-primary/10">
               <h3 className="text-2xl font-bold text-primary mb-4">Discover More Premium Products</h3>
               <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
                 Explore our complete collection of handpicked, premium groceries curated by culinary experts.
@@ -567,7 +575,7 @@ const BuyerHome = () => {
       </section>
 
       {/* Premium Testimonials */}
-      <section className="py-20 bg-gradient-to-br from-secondary to-white">
+      <section className="py-20 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center bg-accent/10 text-accent px-6 py-2 rounded-full text-sm font-semibold mb-6">
@@ -657,7 +665,7 @@ const BuyerHome = () => {
           </div>
           
           <div className="text-center mt-12">
-            <div className="bg-gradient-to-r from-primary/5 to-accent/5 rounded-2xl p-8 border border-primary/10">
+            <div className="bg-primary/5 rounded-2xl p-8 border border-primary/10">
               <div className="flex items-center justify-center gap-8 mb-6">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary mb-1">4.9/5</div>
@@ -683,7 +691,7 @@ const BuyerHome = () => {
       {/* Premium Newsletter */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-[#B0DB9C] to-[#ECFAE5] rounded-3xl p-8 md:p-16 relative overflow-hidden">
+          <div className="bg-accent/20 rounded-3xl p-8 md:p-16 relative overflow-hidden">
             {/* Background Image */}
             <div 
               className="absolute inset-0 opacity-10"
@@ -786,7 +794,7 @@ const BuyerHome = () => {
       {/* Floating AI Chat Button */}
       <Link 
         to="/ai-chat"
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-primary to-primary/90 text-textLight p-4 rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 z-40 group"
+        className="fixed bottom-6 right-6 bg-primary text-textLight p-4 rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 z-40 group"
       >
         <div className="relative">
           <MessageCircle className="w-6 h-6" />

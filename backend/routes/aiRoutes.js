@@ -247,4 +247,185 @@ router.delete('/history', authMiddleware, async (req, res) => {
   }
 });
 
+// AI Product Recommendations endpoint
+router.get('/recommendations', authMiddleware, async (req, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const pool = require('../config/db');
+    
+    // Get user's recent purchase history
+    const purchaseHistoryQuery = `
+      SELECT DISTINCT p.name, p.description, c.name as category_name, oi.quantity
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.id
+      LEFT JOIN categories c ON p.category_id = c.id
+      JOIN orders o ON oi.order_id = o.id
+      WHERE o.user_id = $1 AND o.status = 'delivered'
+      ORDER BY o.created_at DESC
+      LIMIT 20
+    `;
+    
+    const purchaseHistory = await pool.query(purchaseHistoryQuery, [req.user.id]);
+    
+    // Get current cart items
+    const cartQuery = `
+      SELECT p.name, p.description, c.name as category_name, cart.quantity
+      FROM cart
+      JOIN products p ON cart.product_id = p.id
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE cart.user_id = $1
+    `;
+    
+    const cartItems = await pool.query(cartQuery, [req.user.id]);
+    
+    // Get available products for recommendations (excluding already purchased/in cart)
+    const excludeProductsQuery = `
+      SELECT DISTINCT p.id FROM products p
+      LEFT JOIN order_items oi ON p.id = oi.product_id
+      LEFT JOIN orders o ON oi.order_id = o.id
+      LEFT JOIN cart c ON p.id = c.product_id
+      WHERE (o.user_id = $1 AND o.status = 'delivered') OR c.user_id = $1
+    `;
+    
+    const excludeProducts = await pool.query(excludeProductsQuery, [req.user.id]);
+    const excludedIds = excludeProducts.rows.map(row => row.id);
+    
+    const availableProductsQuery = `
+      SELECT p.name, p.description, c.name as category_name
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE p.is_active = true 
+      ${excludedIds.length > 0 ? `AND p.id NOT IN (${excludedIds.map((_, i) => `$${i + 2}`).join(',')})` : ''}
+      ORDER BY p.created_at DESC
+      LIMIT 50
+    `;
+    
+    const availableProducts = await pool.query(
+      availableProductsQuery, 
+      [req.user.id, ...excludedIds]
+    );
+
+    // Prepare AI prompt
+    const purchaseHistoryText = purchaseHistory.rows.length > 0 
+      ? purchaseHistory.rows.map(item => `${item.name} (${item.category_name}, qty: ${item.quantity})`).join(', ')
+      : 'No purchase history';
+      
+    const cartItemsText = cartItems.rows.length > 0
+      ? cartItems.rows.map(item => `${item.name} (${item.category_name}, qty: ${item.quantity})`).join(', ')
+      : 'Empty cart';
+      
+    const availableProductsText = availableProducts.rows.slice(0, 30).map(p => `${p.name} (${p.category_name})`).join(', ');
+
+    const prompt = `You are an AI shopping assistant for GrocerAI. Based on the user's shopping data, recommend 3-4 products they might want to buy.
+
+User's Recent Purchase History: ${purchaseHistoryText}
+
+Current Cart Items: ${cartItemsText}
+
+Available Products to Choose From: ${availableProductsText}
+
+Please recommend 3-4 products from the available list that would complement their shopping pattern. Consider:
+- Items that pair well with their recent purchases
+- Products that complete meals or recipes
+- Seasonal or complementary items
+- Different categories for variety
+
+Respond ONLY with a JSON array in this exact format (no other text):
+[
+  {"name": "Product Name", "reason": "Brief reason why this product fits their shopping pattern"},
+  {"name": "Product Name", "reason": "Brief reason why this product fits their shopping pattern"}
+]
+
+Make sure product names exactly match those from the available products list.`;
+
+    let recommendations = [];
+    
+    try {
+      // Import Gemini SDK
+      const { GoogleGenerativeAI } = require('@google/generative-ai');
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+
+      // Generate recommendations using Gemini
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const aiResponse = response.text();
+      
+      // Parse AI response
+      try {
+        const cleanResponse = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        recommendations = JSON.parse(cleanResponse);
+        
+        // Validate recommendations format
+        if (!Array.isArray(recommendations) || recommendations.length === 0) {
+          throw new Error('Invalid recommendations format');
+        }
+        
+        // Ensure each recommendation has required fields
+        recommendations = recommendations.filter(rec => rec.name && rec.reason).slice(0, 4);
+        
+      } catch (parseError) {
+        console.error('Error parsing AI recommendations:', parseError);
+        throw new Error('Failed to parse AI response');
+      }
+      
+    } catch (aiError) {
+      console.error('Gemini AI Error:', aiError);
+      
+      // Fallback to rule-based recommendations
+      const fallbackQuery = `
+        SELECT p.name, c.name as category_name
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE p.is_active = true 
+        ${excludedIds.length > 0 ? `AND p.id NOT IN (${excludedIds.map((_, i) => `$${i + 2}`).join(',')})` : ''}
+        ORDER BY RANDOM()
+        LIMIT 4
+      `;
+      
+      const fallbackProducts = await pool.query(
+        fallbackQuery, 
+        [req.user.id, ...excludedIds]
+      );
+      
+      recommendations = fallbackProducts.rows.map(product => ({
+        name: product.name,
+        reason: `Popular ${product.category_name} item you might enjoy`
+      }));
+    }
+
+    const responseTime = Date.now() - startTime;
+
+    // Save recommendations to database
+    const saveQuery = `
+      INSERT INTO ai_recommendations (user_id, recommendations)
+      VALUES ($1, $2)
+      RETURNING id, created_at
+    `;
+    
+    const savedRec = await pool.query(saveQuery, [
+      req.user.id,
+      JSON.stringify(recommendations)
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        recommendations,
+        responseTime,
+        savedAt: savedRec.rows[0].created_at,
+        recommendationId: savedRec.rows[0].id
+      }
+    });
+
+  } catch (error) {
+    console.error('AI Recommendations Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate recommendations'
+    });
+  }
+});
+
 module.exports = router;

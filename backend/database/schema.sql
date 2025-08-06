@@ -5,7 +5,27 @@ CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    -- AI analytics table
+CREATE TABLE IF NOT EXISTS ai_analytics (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    chat_type VARCHAR(50),
+    query_text TEXT,
+    response_text TEXT,
+    tokens_used INTEGER,
+    date DATE DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- AI recommendations table
+CREATE TABLE IF NOT EXISTS ai_recommendations (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    recommendations JSONB NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for better performanceR(255) NOT NULL,
     role VARCHAR(20) DEFAULT 'customer' CHECK (role IN ('customer', 'admin')),
     phone VARCHAR(20),
     is_active BOOLEAN DEFAULT true,
@@ -212,6 +232,8 @@ CREATE INDEX IF NOT EXISTS idx_ai_chat_session ON ai_chat_history(session_id);
 CREATE INDEX IF NOT EXISTS idx_ai_chat_type ON ai_chat_history(chat_type);
 CREATE INDEX IF NOT EXISTS idx_ai_chat_created ON ai_chat_history(created_at);
 CREATE INDEX IF NOT EXISTS idx_ai_analytics_date ON ai_analytics(date);
+CREATE INDEX IF NOT EXISTS idx_ai_recommendations_user ON ai_recommendations(user_id);
+CREATE INDEX IF NOT EXISTS idx_ai_recommendations_created ON ai_recommendations(created_at);
 
 -- Insert default admin user (password: admin123)
 INSERT INTO users (name, email, password, role) VALUES 

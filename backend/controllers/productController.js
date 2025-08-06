@@ -120,13 +120,15 @@ const getLowStockProducts = async (req, res) => {
 
 const searchProducts = async (req, res) => {
   try {
-    const { q } = req.query;
-    if (!q) {
+    const { q, name } = req.query;
+    const searchQuery = q || name;
+    
+    if (!searchQuery) {
       return res.status(400).json({ success: false, message: 'Search query is required' });
     }
 
     const products = await Product.findAll({ 
-      search: q, 
+      search: searchQuery, 
       limit: parseInt(req.query.limit) || 20,
       offset: parseInt(req.query.offset) || 0
     });
