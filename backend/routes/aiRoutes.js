@@ -252,11 +252,13 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
   const startTime = Date.now();
   
   try {
+    console.log('AI Recommendations request from user:', req.user.id);
+    
     const pool = require('../config/db');
     
     // Get user's recent purchase history
     const purchaseHistoryQuery = `
-      SELECT DISTINCT p.name, p.description, c.name as category_name, oi.quantity
+      SELECT DISTINCT p.name, p.description, c.name as category_name, oi.quantity, o.created_at
       FROM order_items oi
       JOIN products p ON oi.product_id = p.id
       LEFT JOIN categories c ON p.category_id = c.id
@@ -266,7 +268,9 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
       LIMIT 20
     `;
     
+    console.log('Fetching purchase history for user:', req.user.id);
     const purchaseHistory = await pool.query(purchaseHistoryQuery, [req.user.id]);
+    console.log('Purchase history count:', purchaseHistory.rows.length);
     
     // Get current cart items
     const cartQuery = `
@@ -277,7 +281,9 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
       WHERE cart.user_id = $1
     `;
     
+    console.log('Fetching cart items for user:', req.user.id);
     const cartItems = await pool.query(cartQuery, [req.user.id]);
+    console.log('Cart items count:', cartItems.rows.length);
     
     // Get available products for recommendations (excluding already purchased/in cart)
     const excludeProductsQuery = `
@@ -288,23 +294,52 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
       WHERE (o.user_id = $1 AND o.status = 'delivered') OR c.user_id = $1
     `;
     
+    console.log('Finding products to exclude for user:', req.user.id);
     const excludeProducts = await pool.query(excludeProductsQuery, [req.user.id]);
     const excludedIds = excludeProducts.rows.map(row => row.id);
+    console.log('Excluded product IDs:', excludedIds.length);
     
-    const availableProductsQuery = `
-      SELECT p.name, p.description, c.name as category_name
-      FROM products p
-      LEFT JOIN categories c ON p.category_id = c.id
-      WHERE p.is_active = true 
-      ${excludedIds.length > 0 ? `AND p.id NOT IN (${excludedIds.map((_, i) => `$${i + 2}`).join(',')})` : ''}
-      ORDER BY p.created_at DESC
-      LIMIT 50
-    `;
+    let availableProductsQuery, queryParams;
     
-    const availableProducts = await pool.query(
-      availableProductsQuery, 
-      [req.user.id, ...excludedIds]
-    );
+    if (excludedIds.length > 0) {
+      availableProductsQuery = `
+        SELECT p.name, p.description, c.name as category_name
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE p.is_active = true 
+        AND p.id NOT IN (${excludedIds.map((_, i) => `$${i + 1}`).join(',')})
+        ORDER BY p.created_at DESC
+        LIMIT 50
+      `;
+      queryParams = excludedIds;
+    } else {
+      availableProductsQuery = `
+        SELECT p.name, p.description, c.name as category_name
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE p.is_active = true 
+        ORDER BY p.created_at DESC
+        LIMIT 50
+      `;
+      queryParams = [];
+    }
+    
+    console.log('Fetching available products...');
+    const availableProducts = await pool.query(availableProductsQuery, queryParams);
+    console.log('Available products count:', availableProducts.rows.length);
+
+    // Check if we have products to recommend
+    if (availableProducts.rows.length === 0) {
+      console.log('No available products for recommendations');
+      return res.json({
+        success: true,
+        data: {
+          recommendations: [],
+          message: 'No new products available for recommendations at the moment.',
+          responseTime: Date.now() - startTime
+        }
+      });
+    }
 
     // Prepare AI prompt
     const purchaseHistoryText = purchaseHistory.rows.length > 0 
@@ -316,6 +351,12 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
       : 'Empty cart';
       
     const availableProductsText = availableProducts.rows.slice(0, 30).map(p => `${p.name} (${p.category_name})`).join(', ');
+
+    console.log('Preparing AI prompt with data:', {
+      purchaseHistoryItems: purchaseHistory.rows.length,
+      cartItems: cartItems.rows.length,
+      availableProducts: availableProducts.rows.length
+    });
 
     const prompt = `You are an AI shopping assistant for GrocerAI. Based on the user's shopping data, recommend 3-4 products they might want to buy.
 
@@ -342,6 +383,14 @@ Make sure product names exactly match those from the available products list.`;
     let recommendations = [];
     
     try {
+      console.log('Calling Gemini AI for recommendations...');
+      
+      // Check if Gemini API key is available
+      if (!process.env.GEMINI_API_KEY) {
+        console.error('GEMINI_API_KEY not found in environment variables');
+        throw new Error('AI service not configured');
+      }
+      
       // Import Gemini SDK
       const { GoogleGenerativeAI } = require('@google/generative-ai');
       const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -352,10 +401,14 @@ Make sure product names exactly match those from the available products list.`;
       const response = await result.response;
       const aiResponse = response.text();
       
+      console.log('Gemini AI response received, length:', aiResponse.length);
+      
       // Parse AI response
       try {
         const cleanResponse = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         recommendations = JSON.parse(cleanResponse);
+        
+        console.log('Parsed recommendations:', recommendations.length);
         
         // Validate recommendations format
         if (!Array.isArray(recommendations) || recommendations.length === 0) {
@@ -364,9 +417,11 @@ Make sure product names exactly match those from the available products list.`;
         
         // Ensure each recommendation has required fields
         recommendations = recommendations.filter(rec => rec.name && rec.reason).slice(0, 4);
+        console.log('Filtered recommendations:', recommendations.length);
         
       } catch (parseError) {
         console.error('Error parsing AI recommendations:', parseError);
+        console.error('Raw AI response:', aiResponse);
         throw new Error('Failed to parse AI response');
       }
       
@@ -374,20 +429,35 @@ Make sure product names exactly match those from the available products list.`;
       console.error('Gemini AI Error:', aiError);
       
       // Fallback to rule-based recommendations
-      const fallbackQuery = `
-        SELECT p.name, c.name as category_name
-        FROM products p
-        LEFT JOIN categories c ON p.category_id = c.id
-        WHERE p.is_active = true 
-        ${excludedIds.length > 0 ? `AND p.id NOT IN (${excludedIds.map((_, i) => `$${i + 2}`).join(',')})` : ''}
-        ORDER BY RANDOM()
-        LIMIT 4
-      `;
+      console.log('Using fallback recommendations...');
+      let fallbackQuery, fallbackParams;
       
-      const fallbackProducts = await pool.query(
-        fallbackQuery, 
-        [req.user.id, ...excludedIds]
-      );
+      if (excludedIds.length > 0) {
+        fallbackQuery = `
+          SELECT p.name, c.name as category_name
+          FROM products p
+          LEFT JOIN categories c ON p.category_id = c.id
+          WHERE p.is_active = true 
+          AND p.id NOT IN (${excludedIds.map((_, i) => `$${i + 1}`).join(',')})
+          ORDER BY RANDOM()
+          LIMIT 4
+        `;
+        fallbackParams = excludedIds;
+      } else {
+        fallbackQuery = `
+          SELECT p.name, c.name as category_name
+          FROM products p
+          LEFT JOIN categories c ON p.category_id = c.id
+          WHERE p.is_active = true 
+          ORDER BY RANDOM()
+          LIMIT 4
+        `;
+        fallbackParams = [];
+      }
+      
+      const fallbackProducts = await pool.query(fallbackQuery, fallbackParams);
+      
+      console.log('Fallback products count:', fallbackProducts.rows.length);
       
       recommendations = fallbackProducts.rows.map(product => ({
         name: product.name,
@@ -396,6 +466,7 @@ Make sure product names exactly match those from the available products list.`;
     }
 
     const responseTime = Date.now() - startTime;
+    console.log('Recommendations generated in:', responseTime + 'ms');
 
     // Save recommendations to database
     const saveQuery = `
@@ -404,10 +475,13 @@ Make sure product names exactly match those from the available products list.`;
       RETURNING id, created_at
     `;
     
+    console.log('Saving recommendations to database...');
     const savedRec = await pool.query(saveQuery, [
       req.user.id,
       JSON.stringify(recommendations)
     ]);
+
+    console.log('Recommendations saved successfully');
 
     res.json({
       success: true,
@@ -421,9 +495,11 @@ Make sure product names exactly match those from the available products list.`;
 
   } catch (error) {
     console.error('AI Recommendations Error:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
-      error: 'Failed to generate recommendations'
+      error: 'Failed to generate recommendations',
+      details: error.message
     });
   }
 });

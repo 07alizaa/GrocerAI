@@ -19,6 +19,7 @@ const AdminReports = () => {
   const [loading, setLoading] = useState(true);
   const [dashboardStats, setDashboardStats] = useState(null);
   const [aiAnalytics, setAiAnalytics] = useState(null);
+  const [reportsData, setReportsData] = useState(null);
   const [dateRange, setDateRange] = useState('30days');
   const [reportType, setReportType] = useState('overview');
 
@@ -35,6 +36,7 @@ const AdminReports = () => {
         timeRange: dateRange,
         reportType: reportType
       });
+      setReportsData(reportsResponse.data);
       
       // Fetch AI analytics
       const analyticsResponse = await adminAiAPI.getAnalytics();
@@ -316,18 +318,29 @@ const AdminReports = () => {
                 Top Products
               </h3>
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-textDark/60">Fresh Apples</span>
-                  <span className="font-semibold text-textDark">{Math.floor((dashboardStats?.totalOrders || 0) * 0.4)} sold</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-textDark/60">Organic Milk</span>
-                  <span className="font-semibold text-textDark">{Math.floor((dashboardStats?.totalOrders || 0) * 0.3)} sold</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-textDark/60">Whole Wheat Bread</span>
-                  <span className="font-semibold text-textDark">{Math.floor((dashboardStats?.totalOrders || 0) * 0.2)} sold</span>
-                </div>
+                {reportsData?.sales?.topProducts?.length > 0 ? (
+                  reportsData.sales.topProducts.slice(0, 3).map((product, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <span className="text-textDark/60">{product.name}</span>
+                      <span className="font-semibold text-textDark">{product.total_sold} sold</span>
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    <div className="flex justify-between items-center">
+                      <span className="text-textDark/60">No product data</span>
+                      <span className="font-semibold text-textDark">0 sold</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-textDark/60">Please place some orders</span>
+                      <span className="font-semibold text-textDark">0 sold</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-textDark/60">to see top products</span>
+                      <span className="font-semibold text-textDark">0 sold</span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
