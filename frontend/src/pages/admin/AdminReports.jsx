@@ -22,6 +22,7 @@ const AdminReports = () => {
   const [reportsData, setReportsData] = useState(null);
   const [dateRange, setDateRange] = useState('30days');
   const [reportType, setReportType] = useState('overview');
+  const [showExportOptions, setShowExportOptions] = useState(false);
 
   const fetchReportsData = useCallback(async () => {
     try {
@@ -75,9 +76,252 @@ const AdminReports = () => {
     fetchReportsData();
   }, [fetchReportsData]);
 
-  const exportReport = () => {
-    // Mock export functionality
-    alert('Report export functionality coming soon!');
+  // Close export options when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showExportOptions && !event.target.closest('.export-dropdown')) {
+        setShowExportOptions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showExportOptions]);
+
+  const exportReport = async () => {
+    try {
+      setLoading(true);
+      
+      // Prepare export data
+      const exportData = {
+        reportType: reportType,
+        dateRange: dateRange,
+        generatedAt: new Date().toISOString(),
+        dashboardStats: dashboardStats,
+        aiAnalytics: aiAnalytics,
+        reportsData: reportsData
+      };
+
+      // Create filename with timestamp
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `GrocerAI_Report_${reportType}_${dateRange}_${timestamp}`;
+
+      // Export as CSV (most compatible format)
+      exportAsCSV(exportData, filename);
+      
+    } catch (error) {
+      console.error('Error exporting report:', error);
+      alert('Failed to export report. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const exportAsCSV = (data, filename) => {
+    let csvContent = '';
+    
+    // Header information
+    csvContent += `GrocerAI Admin Report\n`;
+    csvContent += `Report Type: ${data.reportType}\n`;
+    csvContent += `Date Range: ${data.dateRange}\n`;
+    csvContent += `Generated At: ${new Date(data.generatedAt).toLocaleString()}\n`;
+    csvContent += `\n`;
+
+    // Dashboard Statistics
+    csvContent += `DASHBOARD STATISTICS\n`;
+    csvContent += `Metric,Value\n`;
+    csvContent += `Total Users,${data.dashboardStats?.totalUsers || 0}\n`;
+    csvContent += `Total Products,${data.dashboardStats?.totalProducts || 0}\n`;
+    csvContent += `Total Orders,${data.dashboardStats?.totalOrders || 0}\n`;
+    csvContent += `Total Revenue,₹${data.dashboardStats?.totalRevenue?.toLocaleString() || '0'}\n`;
+    csvContent += `\n`;
+
+    // AI Analytics
+    if (data.aiAnalytics) {
+      csvContent += `AI ANALYTICS\n`;
+      csvContent += `Metric,Value\n`;
+      csvContent += `Total Interactions,${data.aiAnalytics.totalInteractions || 0}\n`;
+      csvContent += `Today's Interactions,${data.aiAnalytics.todayInteractions || 0}\n`;
+      csvContent += `Average Response Time,${data.aiAnalytics.averageResponseTime || 'N/A'}\n`;
+      csvContent += `User Satisfaction,${data.aiAnalytics.userSatisfaction || 0}/5\n`;
+      csvContent += `\n`;
+
+      // Popular AI Queries
+      if (data.aiAnalytics.popularQueries && data.aiAnalytics.popularQueries.length > 0) {
+        csvContent += `POPULAR AI QUERIES\n`;
+        csvContent += `Query,Count\n`;
+        data.aiAnalytics.popularQueries.forEach(query => {
+          csvContent += `"${query.query}",${query.count}\n`;
+        });
+        csvContent += `\n`;
+      }
+    }
+
+    // Top Products (if available in reports data)
+    if (data.reportsData?.sales?.topProducts) {
+      csvContent += `TOP SELLING PRODUCTS\n`;
+      csvContent += `Product Name,Total Sold,Revenue\n`;
+      data.reportsData.sales.topProducts.forEach(product => {
+        csvContent += `"${product.name}",${product.total_sold || 0},₹${product.revenue || 0}\n`;
+      });
+      csvContent += `\n`;
+    }
+
+    // Create and download CSV file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `${filename}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Success notification
+      alert(`Report exported successfully as ${filename}.csv`);
+    } else {
+      alert('Export failed. Your browser does not support file downloads.');
+    }
+  };
+
+  const exportAsJSON = async () => {
+    try {
+      setLoading(true);
+      
+      // Prepare export data
+      const exportData = {
+        reportType: reportType,
+        dateRange: dateRange,
+        generatedAt: new Date().toISOString(),
+        dashboardStats: dashboardStats,
+        aiAnalytics: aiAnalytics,
+        reportsData: reportsData
+      };
+
+      // Create filename with timestamp
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `GrocerAI_Report_${reportType}_${dateRange}_${timestamp}`;
+
+      // Create and download JSON file
+      const jsonString = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
+      const link = document.createElement('a');
+      
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${filename}.json`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        alert(`Report exported successfully as ${filename}.json`);
+      } else {
+        alert('Export failed. Your browser does not support file downloads.');
+      }
+    } catch (error) {
+      console.error('Error exporting JSON report:', error);
+      alert('Failed to export report. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const exportForPrint = () => {
+    // Create a printable version
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Please allow popups to print the report.');
+      return;
+    }
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>GrocerAI Admin Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .section { margin-bottom: 25px; }
+            .section h2 { color: #004526; border-bottom: 2px solid #004526; padding-bottom: 5px; }
+            .stats-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+            .stats-table th, .stats-table td { padding: 8px; text-align: left; border: 1px solid #ddd; }
+            .stats-table th { background-color: #f2f2f2; }
+            .highlight { background-color: #fffacd; }
+            @media print { body { margin: 0; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>🛒 GrocerAI Admin Report</h1>
+            <p><strong>Report Type:</strong> ${reportType} | <strong>Date Range:</strong> ${dateRange}</p>
+            <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+          </div>
+
+          <div class="section">
+            <h2>📊 Dashboard Statistics</h2>
+            <table class="stats-table">
+              <tr><th>Metric</th><th>Value</th></tr>
+              <tr><td>Total Users</td><td>${dashboardStats?.totalUsers || 0}</td></tr>
+              <tr><td>Total Products</td><td>${dashboardStats?.totalProducts || 0}</td></tr>
+              <tr><td>Total Orders</td><td>${dashboardStats?.totalOrders || 0}</td></tr>
+              <tr class="highlight"><td>Total Revenue</td><td>₹${dashboardStats?.totalRevenue?.toLocaleString() || '0'}</td></tr>
+            </table>
+          </div>
+
+          <div class="section">
+            <h2>🤖 AI Analytics</h2>
+            <table class="stats-table">
+              <tr><th>Metric</th><th>Value</th></tr>
+              <tr><td>Total Interactions</td><td>${aiAnalytics?.totalInteractions || 0}</td></tr>
+              <tr><td>Today's Interactions</td><td>${aiAnalytics?.todayInteractions || 0}</td></tr>
+              <tr><td>Average Response Time</td><td>${aiAnalytics?.averageResponseTime || 'N/A'}</td></tr>
+              <tr><td>User Satisfaction</td><td>${aiAnalytics?.userSatisfaction || 0}/5</td></tr>
+            </table>
+          </div>
+
+          ${aiAnalytics?.popularQueries?.length > 0 ? `
+          <div class="section">
+            <h2>💬 Popular AI Queries</h2>
+            <table class="stats-table">
+              <tr><th>Query</th><th>Count</th></tr>
+              ${aiAnalytics.popularQueries.map(query => 
+                `<tr><td>${query.query}</td><td>${query.count}</td></tr>`
+              ).join('')}
+            </table>
+          </div>
+          ` : ''}
+
+          ${reportsData?.sales?.topProducts?.length > 0 ? `
+          <div class="section">
+            <h2>🏆 Top Selling Products</h2>
+            <table class="stats-table">
+              <tr><th>Product Name</th><th>Total Sold</th><th>Revenue</th></tr>
+              ${reportsData.sales.topProducts.map(product => 
+                `<tr><td>${product.name}</td><td>${product.total_sold || 0}</td><td>₹${product.revenue || 0}</td></tr>`
+              ).join('')}
+            </table>
+          </div>
+          ` : ''}
+
+          <div class="section" style="text-align: center; margin-top: 40px; color: #666;">
+            <p>Generated by GrocerAI Admin Dashboard</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
   };
 
   if (loading) {
@@ -102,13 +346,49 @@ const AdminReports = () => {
               <p className="text-textLight/80 text-lg">Comprehensive business insights and performance metrics</p>
             </div>
             <div className="flex space-x-4">
-              <button
-                onClick={exportReport}
-                className="bg-accent text-primary px-6 py-3 rounded-xl font-semibold hover:bg-accent/90 transition-colors flex items-center space-x-2"
-              >
-                <Download className="h-5 w-5" />
-                <span>Export Report</span>
-              </button>
+              <div className="relative export-dropdown">
+                <button
+                  onClick={() => setShowExportOptions(!showExportOptions)}
+                  className="bg-accent text-primary px-6 py-3 rounded-xl font-semibold hover:bg-accent/90 transition-colors flex items-center space-x-2"
+                >
+                  <Download className="h-5 w-5" />
+                  <span>Export Report</span>
+                </button>
+                
+                {showExportOptions && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-10">
+                    <div className="py-2">
+                      <button
+                        onClick={() => {
+                          exportReport();
+                          setShowExportOptions(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        📊 Export as CSV
+                      </button>
+                      <button
+                        onClick={() => {
+                          exportAsJSON();
+                          setShowExportOptions(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        📄 Export as JSON
+                      </button>
+                      <button
+                        onClick={() => {
+                          exportForPrint();
+                          setShowExportOptions(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        🖨️ Print Report
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

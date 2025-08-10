@@ -88,12 +88,3 @@ yarn-error.log
 # Runtime files
 .pm2/
 ecosystem.config.js
-
-# Debug and testing files
-test-*.js
-*-test.js
-debug-*.js
-*-debug.js
-AI_RECOMMENDATIONS_TESTING.md
-*.test.log
-*.debug.log
